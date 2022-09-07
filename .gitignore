@@ -8,3 +8,4 @@ chrome_profiles/
 
 .DS_Store
 chromedriver
+.idea
