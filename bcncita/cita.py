@@ -10,7 +10,6 @@ import time
 from base64 import b64decode
 from dataclasses import dataclass, field
 from datetime import datetime as dt
-from enum import Enum
 from json.decoder import JSONDecodeError
 from typing import Any, Dict, Optional
 
@@ -26,136 +25,21 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import Select
 from selenium.webdriver.support.wait import WebDriverWait
 
-from .speaker import new_speaker
+from constants.doc_type import DocType
+from constants.operation_type import OperationType
+from constants.province import Province
 
 __all__ = [
     "try_cita",
     "start_with",
     "init_wedriver",
     "CustomerProfile",
-    "DocType",
-    "OperationType",
-    "Office",
-    "Province",
 ]
 
 CYCLES = 144
 REFRESH_PAGE_CYCLES = 12
 
 DELAY = 30  # timeout for page load
-
-speaker = new_speaker()
-
-
-class DocType(str, Enum):
-    DNI = "dni"
-    NIE = "nie"
-    PASSPORT = "passport"
-
-
-class OperationType(str, Enum):
-    AUTORIZACION_DE_REGRESO = "20"  # POLICIA-AUTORIZACIÓN DE REGRESO
-    BREXIT = "4094"  # POLICÍA-EXP.TARJETA ASOCIADA AL ACUERDO DE RETIRADA CIUDADANOS BRITÁNICOS Y SUS FAMILIARES (BREXIT)
-    CARTA_INVITACION = "4037"  # POLICIA-CARTA DE INVITACIÓN
-    CERTIFICADOS_NIE = "4096"  # POLICIA-CERTIFICADOS Y ASIGNACION NIE
-    CERTIFICADOS_NIE_NO_COMUN = "4079"  # POLICIA-CERTIFICADOS Y ASIGNACION NIE (NO COMUNITARIOS)
-    CERTIFICADOS_RESIDENCIA = "4049"  # POLICIA-CERTIFICADOS (DE RESIDENCIA, DE NO RESIDENCIA Y DE CONCORDANCIA) #fmt: off
-    CERTIFICADOS_UE = "4038"  # POLICIA-CERTIFICADO DE REGISTRO DE CIUDADANO DE LA U.E.
-    RECOGIDA_DE_TARJETA = "4036"  # POLICIA - RECOGIDA DE TARJETA DE IDENTIDAD DE EXTRANJERO (TIE)
-    SOLICITUD_ASILO = "4078"  # POLICIA - SOLICITUD ASILO
-    TOMA_HUELLAS = "4010"  # POLICIA-TOMA DE HUELLAS (EXPEDICIÓN DE TARJETA) Y RENOVACIÓN DE TARJETA DE LARGA DURACIÓN
-    ASIGNACION_NIE = "4031"  # Asignación de N.I.E.
-
-
-class Office(str, Enum):
-    # Barcelona
-    BADALONA = "18"  # CNP-COMISARIA BADALONA, AVDA. DELS VENTS (9)
-    BARCELONA = "16"  # CNP - RAMBLA GUIPUSCOA 74, RAMBLA GUIPUSCOA (74)
-    BARCELONA_MALLORCA = "14"  # CNP MALLORCA-GRANADOS, MALLORCA (213)
-    CASTELLDEFELS = "19"  # CNP-COMISARIA CASTELLDEFELS, PLAÇA DE L`ESPERANTO (4)
-    CERDANYOLA = "20"  # CNP-COMISARIA CERDANYOLA DEL VALLES, VERGE DE LES FEIXES (4)
-    CORNELLA = "21"  # CNP-COMISARIA CORNELLA DE LLOBREGAT, AV. SANT ILDEFONS, S/N
-    ELPRAT = "23"  # CNP-COMISARIA EL PRAT DE LLOBREGAT, CENTRE (4)
-    GRANOLLERS = "28"  # CNP-COMISARIA GRANOLLERS, RICOMA (65)
-    HOSPITALET = "17"  # CNP-COMISARIA L`HOSPITALET DE LLOBREGAT, Rbla. Just Oliveres (43)
-    IGUALADA = "26"  # CNP-COMISARIA IGUALADA, PRAT DE LA RIBA (13)
-    MANRESA = "38"  # CNP-COMISARIA MANRESA, SOLER I MARCH (5)
-    MATARO = "27"  # CNP-COMISARIA MATARO, AV. GATASSA (15)
-    MONTCADA = "31"  # CNP-COMISARIA MONTCADA I REIXAC, MAJOR (38)
-    RIPOLLET = "32"  # CNP-COMISARIA RIPOLLET, TAMARIT (78)
-    RUBI = "29"  # CNP-COMISARIA RUBI, TERRASSA (16)
-    SABADELL = "30"  # CNP-COMISARIA SABADELL, BATLLEVELL (115)
-    SANTACOLOMA = "35"  # CNP-COMISARIA SANTA COLOMA DE GRAMENET, IRLANDA (67)
-    SANTADRIA = "33"  # CNP-COMISARIA SANT ADRIA DEL BESOS, AV. JOAN XXIII (2)
-    SANTBOI = "24"  # CNP-COMISARIA SANT BOI DE LLOBREGAT, RIERA BASTÉ (43)
-    SANTCUGAT = "34"  # CNP-COMISARIA SANT CUGAT DEL VALLES, VALLES (1)
-    SANTFELIU = "22"  # CNP-COMISARIA SANT FELIU DE LLOBREGAT, CARRERETES (9)
-    TERRASSA = "36"  # CNP-COMISARIA TERRASSA, BALDRICH (13)
-    VIC = "37"  # CNP-COMISARIA VIC, BISBE MORGADES (4)
-    VILADECANS = "25"  # CNP-COMISARIA VILADECANS, AVDA. BALLESTER (2)
-    VILAFRANCA = "46"  # CNP COMISARIA VILAFRANCA DEL PENEDES, Avinguda Ronda del Mar, 109
-    VILANOVA = "39"  # CNP-COMISARIA VILANOVA I LA GELTRU, VAPOR (19)
-
-    # Tenerife
-    OUE_SANTA_CRUZ = "1"  # 1 OUE SANTA CRUZ DE TENERIFE,  C/LA MARINA, 20
-    PLAYA_AMERICAS = "2"  # CNP-Playa de las Américas, Av. de los Pueblos, 2
-    PUERTO_CRUZ = "3"  # CNP-Puerto de la Cruz/Los Realejos, Av. del Campo y Llarena, 3
-
-
-class Province(str, Enum):
-    A_CORUÑA = "15"
-    ALBACETE = "2"
-    ALICANTE = "3"
-    ALMERÍA = "4"
-    ARABA = "1"
-    ASTURIAS = "33"
-    ÁVILA = "5"
-    BADAJOZ = "6"
-    BARCELONA = "8"
-    BIZKAIA = "48"
-    BURGOS = "9"
-    CÁCERES = "10"
-    CÁDIZ = "11"
-    CANTABRIA = "39"
-    CASTELLÓN = "12"
-    CEUTA = "51"
-    CIUDAD_REAL = "13"
-    CÓRDOBA = "14"
-    CUENCA = "16"
-    GIPUZKOA = "20"
-    GIRONA = "17"
-    GRANADA = "18"
-    GUADALAJARA = "19"
-    HUELVA = "21"
-    HUESCA = "22"
-    ILLES_BALEARS = "7"
-    JAÉN = "23"
-    LA_RIOJA = "26"
-    LAS_PALMAS = "35"
-    LEÓN = "24"
-    LLEIDA = "25"
-    LUGO = "27"
-    MADRID = "28"
-    MÁLAGA = "29"
-    MELILLA = "52"
-    MURCIA = "30"
-    NAVARRA = "31"
-    ORENSE = "32"
-    PALENCIA = "34"
-    PONTEVEDRA = "36"
-    SALAMANCA = "37"
-    S_CRUZ_TENERIFE = "38"
-    SEGOVIA = "40"
-    SEVILLA = "41"
-    SORIA = "42"
-    TARRAGONA = "43"
-    TERUEL = "44"
-    TOLEDO = "45"
-    VALENCIA = "46"
-    VALLADOLID = "47"
-    ZAMORA = "49"
-    ZARAGOZA = "50"
-
 
 @dataclass
 class CustomerProfile:
@@ -298,7 +182,7 @@ def start_with(driver: webdriver, context: CustomerProfile, cycles: int = CYCLES
 
     if not success:
         logging.error("FAIL")
-        speaker.say("FAIL")
+        #speaker.say("FAIL")
         driver.quit()
 
 
@@ -512,8 +396,6 @@ def process_captcha(driver: webdriver, context: CustomerProfile):
         logging.info(
             "HEY, DO SOMETHING HUMANE TO TRICK THE CAPTCHA (select text, move cursor etc.) and press ENTER"
         )
-        for i in range(10):
-            speaker.say("ALARM")
         input()
 
     return True
@@ -620,7 +502,6 @@ def find_best_date(dates, context: CustomerProfile):
 
 def select_office(driver: webdriver, context: CustomerProfile):
     if not context.auto_office:
-        speaker.say("MAKE A CHOICE")
         logging.info("Select office and press ENTER")
         input()
         return True
@@ -974,8 +855,6 @@ def cita_selection(driver: webdriver, context: CustomerProfile):
         else:
             if not sms_verification:
                 confirm_appointment(driver, context)
-
-            speaker.say("ENTER THE SHORT CODE FROM SMS")
 
             logging.info("Press Any button to CLOSE browser")
             input()

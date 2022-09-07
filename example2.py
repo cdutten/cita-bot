@@ -1,7 +1,11 @@
 import os
 import sys
 
-from bcncita import CustomerProfile, DocType, Office, OperationType, Province, try_cita
+from bcncita import CustomerProfile, try_cita
+from bcncita.constants.doc_type import DocType
+from bcncita.constants.office import Office
+from bcncita.constants.operation_type import OperationType
+from bcncita.constants.province import Province
 
 if __name__ == "__main__":
     customer = CustomerProfile(
