@@ -4,14 +4,14 @@ import unittest
 
 from bcncita import (
     CustomerProfile,
-    DocType,
-    Office,
-    OperationType,
-    Province,
     init_wedriver,
     start_with,
     try_cita,
 )
+from bcncita.constants.doc_type import DocType
+from bcncita.constants.office import Office
+from bcncita.constants.operation_type import OperationType
+from bcncita.constants.province import Province
 
 
 class TestBot(unittest.TestCase):
