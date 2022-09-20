@@ -3,15 +3,15 @@ import os
 import unittest
 
 from bcncita import (
-    CustomerProfile,
     init_wedriver,
     start_with,
     try_cita,
 )
-from bcncita.constants.doc_type import DocType
-from bcncita.constants.office import Office
-from bcncita.constants.operation_type import OperationType
-from bcncita.constants.province import Province
+from constants import DocType
+from constants import Office
+from constants import OperationType
+from constants import Province
+from constants import CustomerProfile
 
 
 class TestBot(unittest.TestCase):
@@ -41,22 +41,6 @@ class TestBot(unittest.TestCase):
         self.assertIn("INFO:root:[Step 2/6] Office selection", logs.output)
         self.assertIn("INFO:root:[Step 3/6] Contact info", logs.output)
         self.assertIn("INFO:root:[Step 4/6] Cita attempt -> selection hit!", logs.output)
-
-        driver = init_wedriver(customer)
-        for province in Province:
-            customer = CustomerProfile(
-                **params,
-                province=province,
-                operation_code=OperationType.TOMA_HUELLAS,
-            )
-            with self.assertLogs(None, level=logging.INFO) as logs:
-                start_with(driver=driver, context=customer, cycles=1)
-
-            self.assertIn(
-                "INFO:root:Instructions page loaded",
-                logs.output,
-                msg=f"Can't load instructions for province={province}",
-            )
 
 
 if __name__ == "__main__":

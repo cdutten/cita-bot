@@ -1,6 +1,18 @@
 Cita Helper ![Build Status](https://github.com/cita-bot/cita-bot/actions/workflows/main.yml/badge.svg)
 ===========
 
+<!-- TOC -->
+* [Cita Helper ![Build Status](https://github.com/cita-bot/cita-bot/actions/workflows/main.yml/badge.svg)](#cita-helper-)
+  * [Support notes](#support-notes)
+  * [Installation TL;DR](#installation-tldr)
+    * [Optional steps for automation:](#optional-steps-for-automation-)
+  * [Examples](#examples)
+  * [Options](#options)
+  * [Troubleshooting](#troubleshooting)
+  * [Generate script for Autofill Chrome extension (NOTE: does not work at the moment)](#generate-script-for-autofill-chrome-extension--note--does-not-work-at-the-moment-)
+  * [Refactoring tasks](#refactoring-tasks)
+<!-- TOC -->
+
 This Selenium automatization script helps to catch cita timeslot for Spanish CNP/Extranjería.
 
 Enable your speakers and wait for "ALARM ALARM ALARM" message :) Next you'll have to confirm an appointment via SMS code.
@@ -152,3 +164,21 @@ extension use `--autofill` option. This approach allows you to forget about capt
 ```bash
 $ python grab_me.py --autofill
 ```
+
+
+Refactoring tasks
+---------------------------------------------------------------------------------
+Devops
+- [X] Dockerize
+- [ ] Kubernetes manifests
+- [ ] Skaffold
+- [ ] Update dependencies
+
+Code
+- [X] Separate Constants from logic
+- [ ] Convert cita.py to a class that can be called with parameters through a cli
+- [ ] Remove temporarily the PDF support
+- [ ] Remove the speakers support
+- [ ] Create tests
+- [ ] Add coverage badge
+- [ ] Create Class to create the logging object

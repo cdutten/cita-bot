@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: cita-bot
+  name: cita-bot
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cita-bot
+  template:
+    metadata:
+      labels:
+        app: cita-bot
+    spec:
+      containers:
+      - image: cdutten/cita-bot-test
+        name: cita-bot
+        command: ["/bin/bash", "-c", "--" ]
+        args: [ "while true; do sleep 30; done;" ]
+        imagePullPolicy: IfNotPresent
