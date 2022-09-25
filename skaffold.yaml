@@ -4,11 +4,11 @@ metadata:
   name: cita-bot
 build:
   artifacts:
-  - image: cdutten/cita-bot-test
+  - image: cdutten/cita-bot
     docker:
       dockerfile: Dockerfile
 deploy:
   kubectl:
     manifests:
-    - k8s/cita-bot-deploy.yaml
     - k8s/cita-bot-ns.yaml
+    - k8s/cita-bot-deploy.yaml

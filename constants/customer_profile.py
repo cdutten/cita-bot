@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
-from doc_type import DocType
-from province import Province
-from operation_type import OperationType
+from constants import DocType
+from constants import Province
+from constants import OperationType
 from typing import Any, Optional
 import sys
 

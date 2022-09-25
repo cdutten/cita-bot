@@ -58,17 +58,14 @@ class Main:
         options.add_argument("--disable-gpu")
         # this parameter tells Chrome that
         # it should be run without UI (Headless)
-        options.add_argument("--headless")
+ #       options.add_argument("--headless")
 
-        browser = webdriver.Chrome(options=options)
+        driver = webdriver.Chrome(options=options)
         # Overwriting the navigator property to prevent detection of the bot
-        browser.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
-        browser.execute_cdp_cmd("Network.setUserAgentOverride", {"userAgent": self.USER_AGENT})
+        driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
+        driver.execute_cdp_cmd("Network.setUserAgentOverride", {"userAgent": self.USER_AGENT})
 
-        self._driver = browser
-
-    def try_cita(self, cycles: int = CYCLES):
-        self.start_with(cycles)
+        self._driver = driver
 
     def start_with(self, cycles: int = CYCLES):
         logging.basicConfig(
@@ -101,7 +98,7 @@ class Main:
         ]:
             operation_param = "tramiteGrupo[0]"
 
-        fast_forward_url = "https://icp.administracionelectronica.gob.es/{}/citar?p={}".format(
+        url = "https://icp.administracionelectronica.gob.es/{}/citar?p={}".format(
             operation_category, self.context.province
         )
         fast_forward_url2 = "https://icp.administracionelectronica.gob.es/{}/acInfo?{}={}".format(
@@ -113,9 +110,11 @@ class Main:
         for i in range(cycles):
             try:
                 logging.info(f"\033[33m[Attempt {i + 1}/{cycles}]\033[0m")
-                result = self.cycle_cita(fast_forward_url, fast_forward_url2)
-            except KeyboardInterrupt:
-                raise
+                self._driver.set_page_load_timeout(300 if self.context.first_load else 50)
+
+                self.select_province(url)
+                self.initial_page(fast_forward_url2)
+                result = self.cycle_cita()
             except TimeoutException:
                 logging.error("Timeout exception")
             except Exception as e:
@@ -129,7 +128,6 @@ class Main:
 
         if not success:
             logging.error("FAIL")
-            # speaker.say("FAIL")
             self._driver.quit()
 
     def toma_huellas_step2(self):
@@ -581,35 +579,15 @@ class Main:
         on_backoff=log_backoff,
         logger=None,
     )
-    def initial_page(self, fast_forward_url, fast_forward_url2):
-        if self.context.first_load:
-            self._driver.delete_all_cookies()
-
-        self._driver.set_page_load_timeout(300 if self.context.first_load else 50)
-        # Fix chromedriver 103 bug
-        time.sleep(1)
-        self._driver.get(fast_forward_url)
-        time.sleep(5)
-        if self.context.first_load:
-            try:
-                self._driver.execute_script("window.localStorage.clear();")
-                self._driver.execute_script("window.sessionStorage.clear();")
-            except Exception as e:
-                logging.error(e)
-                pass
+    def initial_page(self, fast_forward_url2):
         self._driver.get(fast_forward_url2)
-        time.sleep(5)
 
-        resp_text = self.body_text()
-        if "INTERNET CITA PREVIA" not in resp_text:
-            self.context.first_load = True
-            raise TimeoutException
-
+        WebDriverWait(self._driver, 10).until(
+            expected_conditions.text_to_be_present_in_element_value((By.ID, "prov_selecc"), "Barcelona")
+        )
         self.context.first_load = False
 
-    def cycle_cita(self, fast_forward_url, fast_forward_url2):
-        self.initial_page(fast_forward_url, fast_forward_url2)
-
+    def cycle_cita(self):
         # 1. Instructions page:
         try:
             WebDriverWait(self._driver, self.DELAY).until(
@@ -847,6 +825,18 @@ class Main:
                 element.send_keys(self.context.reason_or_type)
         except Exception as e:
             logging.error(e)
+
+    def select_province(self, url):
+        if self.context.first_load:
+            self._driver.delete_all_cookies()
+
+        self._driver.get(url)
+        try:
+            WebDriverWait(self._driver, 5).until(
+                expected_conditions.title_is("Proceso automático para la solicitud de cita previa")
+            )
+        finally:
+            self._driver.quit()
 
 
 if __name__ == '__main__':

@@ -4,6 +4,7 @@ metadata:
   labels:
     app: cita-bot
   name: cita-bot
+  namespace: cita-bot
 spec:
   replicas: 1
   selector:
@@ -15,7 +16,7 @@ spec:
         app: cita-bot
     spec:
       containers:
-      - image: cdutten/cita-bot-test
+      - image: cdutten/cita-bot
         name: cita-bot
         command: ["/bin/bash", "-c", "--" ]
         args: [ "while true; do sleep 30; done;" ]

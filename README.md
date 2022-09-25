@@ -15,8 +15,6 @@ Cita Helper ![Build Status](https://github.com/cita-bot/cita-bot/actions/workflo
 
 This Selenium automatization script helps to catch cita timeslot for Spanish CNP/Extranjería.
 
-Enable your speakers and wait for "ALARM ALARM ALARM" message :) Next you'll have to confirm an appointment via SMS code.
-
 It can make a reservation automatically if you set up anti-captcha, webhooks and IFTTT applet on your phone, read instructions below.
 
 
@@ -179,6 +177,7 @@ Code
 - [ ] Convert cita.py to a class that can be called with parameters through a cli
 - [ ] Remove temporarily the PDF support
 - [ ] Remove the speakers support
+- [ ] Remove the SMS support
 - [ ] Create tests
 - [ ] Add coverage badge
 - [ ] Create Class to create the logging object
